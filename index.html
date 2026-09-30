@@ -99,9 +99,19 @@ window.addEventListener("beforeinstallprompt",e=>{
  e.preventDefault(); deferredPrompt=e; installBtn.style.display="inline-block";
 });
 installBtn?.addEventListener("click",async()=>{
- if(!deferredPrompt)return;
- deferredPrompt.prompt(); await deferredPrompt.userChoice;
- deferredPrompt=null; installBtn.style.display="none";
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+
+    const result=await deferredPrompt.userChoice;
+
+    if(result.outcome==="accepted"){
+      installBtn.style.display="none";
+    }
+
+    deferredPrompt=null;
+  }else{
+    alert("Chrome ke ⋮ menu par tap karein → Install app / Add to Home screen");
+  }
 });
 window.addEventListener("appinstalled",()=>{installBtn.style.display="none";});
 if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
