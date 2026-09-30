@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/logo.svg">
+<title>Glass Calendar — nodierashid</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#fff;background:radial-gradient(circle at 15% 10%,#3657a855,transparent 35%),radial-gradient(circle at 85% 85%,#9b4dca44,transparent 35%),#07101d;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden}.blob{position:absolute;border-radius:50%;filter:blur(55px);opacity:.35;animation:float 10s ease-in-out infinite}.b1{width:280px;height:280px;background:#4c7dff;left:-80px;top:80px}.b2{width:260px;height:260px;background:#bd57ff;right:-70px;bottom:70px;animation-delay:-4s}
+@keyframes float{50%{transform:translate(30px,-25px) scale(1.08)}}
+.wrap{width:min(1050px,94%);margin:auto;padding:28px 0 45px}.glass{background:#ffffff12;border:1px solid #ffffff20;box-shadow:0 18px 55px #0005,inset 0 1px #ffffff18;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:26px}
+header{padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:13px}.logo{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#ffffff28,#ffffff08);border:1px solid #ffffff25;font-size:24px}.title{font-size:20px;font-weight:800}.sub{font-size:12px;color:#b9c4d5}.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}button,select{border:1px solid #ffffff20;background:#ffffff10;color:#fff;border-radius:12px;padding:10px 13px;cursor:pointer}button:hover{background:#ffffff1c}#installBtn{font-weight:700;background:linear-gradient(135deg,#6b8cff,#9a63ff);border:0}select option{color:#111}
+.main{display:grid;grid-template-columns:1.5fr .85fr;gap:18px}.calendar{padding:22px}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.month{font-size:24px;font-weight:800}.nav{display:flex;gap:7px}.nav button{font-size:18px;width:40px;height:40px;padding:0}.week,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.week div{text-align:center;color:#9eabc0;font-size:12px;padding:8px 0}.day{min-height:62px;border-radius:15px;padding:9px;background:#ffffff08;border:1px solid transparent;position:relative;cursor:pointer;transition:.2s}.day:hover{transform:translateY(-2px);background:#ffffff14}.muted{opacity:.35}.selected{border-color:#9db8ff;background:#688fff2b}.today{box-shadow:inset 0 0 0 1px #fff8}.dot{width:6px;height:6px;border-radius:50%;background:#9fc0ff;position:absolute;bottom:9px;left:50%;transform:translateX(-50%)}.side{padding:22px}.side h2{margin:0 0 5px}.dateinfo{color:#aebbd0;font-size:13px;margin-bottom:20px}.event{padding:13px;border-radius:15px;background:#ffffff0d;border:1px solid #ffffff15;margin:9px 0}.event strong{display:block}.empty{color:#8794aa;font-size:14px;padding:18px 0}.add{width:100%;margin-top:12px;background:linear-gradient(135deg,#6b8cff,#9a63ff);border:0;font-weight:700}.footer{text-align:center;color:#78869c;font-size:12px;margin-top:17px}
+@media(max-width:760px){header{align-items:flex-start;flex-direction:column}.controls{justify-content:flex-start}.main{grid-template-columns:1fr}.day{min-height:54px;padding:7px}.calendar{padding:15px}.side{padding:18px}}
+</style>
+</head>
+<body>
+<div class="bg"><div class="blob b1"></div><div class="blob b2"></div></div>
+<div class="wrap">
+<header class="glass">
+<div class="brand"><div class="logo">◫</div><div><div class="title">Glass Calendar</div><div class="sub">Premium web calendar · Developer: nodierashid</div></div></div>
+<div class="controls"><select id="tz"></select><button id="todayBtn">Today</button><button id="installBtn" style="display:none">⬇ Install</button></div>
+</header>
+<section class="main">
+<div class="glass calendar">
+<div class="top"><div class="month" id="month"></div><div class="nav"><button id="prev">‹</button><button id="next">›</button></div></div>
+<div class="week"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+<div class="days" id="days"></div>
+</div>
+<aside class="glass side">
+<h2 id="selectedTitle">Selected date</h2><div class="dateinfo" id="selectedInfo"></div>
+<div id="events"></div><button class="add" id="add">＋ Add Event</button>
+</aside>
+</section>
+<div class="footer">Your events and timezone are saved locally in this browser. No account required.</div>
+</div>
+<script>
+const zones=["Auto / Device","UTC","Asia/Kolkata","Europe/London","America/New_York","America/Los_Angeles","Asia/Dubai","Asia/Riyadh","Asia/Tokyo","Asia/Shanghai","Asia/Singapore","Australia/Sydney","Europe/Berlin","Europe/Paris","Africa/Johannesburg","America/Sao_Paulo"];
+const tz=document.querySelector("#tz"); zones.forEach(z=>{let o=document.createElement("option");o.value=z;o.textContent=z;tz.appendChild(o)});
+tz.value=localStorage.getItem("gc_tz")||"Auto / Device";
+let view=new Date(), selected=new Date(); view.setDate(1);
+const key=d=>d.toISOString().slice(0,10);
+let events=JSON.parse(localStorage.getItem("gc_events")||"{}");
+function fmt(d, opts={}){let zone=tz.value==="Auto / Device"?undefined:tz.value;return new Intl.DateTimeFormat(undefined,{timeZone:zone,...opts}).format(d)}
+function render(){
+ document.querySelector("#month").textContent=new Intl.DateTimeFormat(undefined,{month:"long",year:"numeric"}).format(view);
+ const first=new Date(view.getFullYear(),view.getMonth(),1), last=new Date(view.getFullYear(),view.getMonth()+1,0);
+ let start=first.getDay(), total=Math.ceil((start+last.getDate())/7)*7, box=document.querySelector("#days"); box.innerHTML="";
+ for(let i=0;i<total;i++){let n=i-start+1,d=new Date(view.getFullYear(),view.getMonth(),n), div=document.createElement("div");div.className="day";
+  if(n<1||n>last.getDate())div.classList.add("muted");else {div.textContent=n;let now=new Date();if(key(d)===key(now))div.classList.add("today");if(key(d)===key(selected))div.classList.add("selected");if(events[key(d)]?.length){let dot=document.createElement("span");dot.className="dot";div.appendChild(dot)}div.onclick=()=>{selected=d;renderSide();render()}}
+  box.appendChild(div)
+ }
+ renderSide()
+}
+function renderSide(){document.querySelector("#selectedTitle").textContent=fmt(selected,{weekday:"long",month:"long",day:"numeric"});document.querySelector("#selectedInfo").textContent=fmt(selected,{year:"numeric"});let list=document.querySelector("#events"), arr=events[key(selected)]||[];list.innerHTML=arr.length?arr.map((e,i)=>`<div class="event"><strong>${esc(e)}</strong><button onclick="removeEvent(${i})" style="margin-top:8px;padding:5px 8px;font-size:11px">Delete</button></div>`).join(""):`<div class="empty">No events for this date.</div>`}
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function removeEvent(i){events[key(selected)].splice(i,1);if(!events[key(selected)].length)delete events[key(selected)];save();render()}
+function save(){localStorage.setItem("gc_events",JSON.stringify(events))}
+document.querySelector("#prev").onclick=()=>{view.setMonth(view.getMonth()-1);render()}
+document.querySelector("#next").onclick=()=>{view.setMonth(view.getMonth()+1);render()}
+document.querySelector("#todayBtn").onclick=()=>{let d=new Date();view=new Date(d.getFullYear(),d.getMonth(),1);selected=d;render()}
+document.querySelector("#add").onclick=()=>{let text=prompt("Event name:");if(text?.trim()){(events[key(selected)]??=[]).push(text.trim());save();render()}}
+tz.onchange=()=>{localStorage.setItem("gc_tz",tz.value);render()}
+
+let deferredPrompt=null;
+const installBtn=document.querySelector("#installBtn");
+window.addEventListener("beforeinstallprompt",e=>{
+ e.preventDefault(); deferredPrompt=e; installBtn.style.display="inline-block";
+});
+installBtn?.addEventListener("click",async()=>{
+ if(!deferredPrompt)return;
+ deferredPrompt.prompt(); await deferredPrompt.userChoice;
+ deferredPrompt=null; installBtn.style.display="none";
+});
+window.addEventListener("appinstalled",()=>{installBtn.style.display="none";});
+if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
+
+render();
+</script>
+</body></html>
