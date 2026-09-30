@@ -92,22 +92,32 @@ document.querySelector("#next").onclick=()=>{view.setMonth(view.getMonth()+1);re
 document.querySelector("#todayBtn").onclick=()=>{let d=new Date();view=new Date(d.getFullYear(),d.getMonth(),1);selected=d;render()}
 document.querySelector("#add").onclick=()=>{let text=prompt("Event name:");if(text?.trim()){(events[key(selected)]??=[]).push(text.trim());save();render()}}
 tz.onchange=()=>{localStorage.setItem("gc_tz",tz.value);render()}
- function installCalendar(){
+let deferredPrompt=null;
+const installBtn=document.querySelector("#installBtn");
+
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+});
+
+function installCalendar(){
   if(deferredPrompt){
     deferredPrompt.prompt();
 
     deferredPrompt.userChoice.then(function(result){
       if(result.outcome==="accepted"){
-        document.querySelector("#installBtn").style.display="none";
+        installBtn.style.display="none";
       }
       deferredPrompt=null;
     });
-
   }else{
-    alert("Install ke liye Chrome ke ⋮ menu par tap karein → Install app → Install");
+    alert("Install option abhi available nahi hai. Chrome menu ⋮ → Install app / Add to Home screen karein.");
   }
 }
-window.addEventListener("appinstalled",()=>{installBtn.style.display="none";});
+
+window.addEventListener("appinstalled",()=>{
+  installBtn.style.display="none";
+});
 if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
 
 render();
