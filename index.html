@@ -15,6 +15,12 @@
 header{padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:13px}.logo{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#ffffff28,#ffffff08);border:1px solid #ffffff25;font-size:24px}.title{font-size:20px;font-weight:800}.sub{font-size:12px;color:#b9c4d5}.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}button,select{border:1px solid #ffffff20;background:#ffffff10;color:#fff;border-radius:12px;padding:10px 13px;cursor:pointer}button:hover{background:#ffffff1c}#installBtn{font-weight:700;background:linear-gradient(135deg,#6b8cff,#9a63ff);border:0}select option{color:#111}
 .main{display:grid;grid-template-columns:1.5fr .85fr;gap:18px}.calendar{padding:22px}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.month{font-size:24px;font-weight:800}.nav{display:flex;gap:7px}.nav button{font-size:18px;width:40px;height:40px;padding:0}.week,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.week div{text-align:center;color:#9eabc0;font-size:12px;padding:8px 0}.day{min-height:62px;border-radius:15px;padding:9px;background:#ffffff08;border:1px solid transparent;position:relative;cursor:pointer;transition:.2s}.day:hover{transform:translateY(-2px);background:#ffffff14}.muted{opacity:.35}.selected{border-color:#9db8ff;background:#688fff2b}.today{box-shadow:inset 0 0 0 1px #fff8}.dot{width:6px;height:6px;border-radius:50%;background:#9fc0ff;position:absolute;bottom:9px;left:50%;transform:translateX(-50%)}.side{padding:22px}.side h2{margin:0 0 5px}.dateinfo{color:#aebbd0;font-size:13px;margin-bottom:20px}.event{padding:13px;border-radius:15px;background:#ffffff0d;border:1px solid #ffffff15;margin:9px 0}.event strong{display:block}.empty{color:#8794aa;font-size:14px;padding:18px 0}.add{width:100%;margin-top:12px;background:linear-gradient(135deg,#6b8cff,#9a63ff);border:0;font-weight:700}.footer{text-align:center;color:#78869c;font-size:12px;margin-top:17px}
 @media(max-width:760px){header{align-items:flex-start;flex-direction:column}.controls{justify-content:flex-start}.main{grid-template-columns:1fr}.day{min-height:54px;padding:7px}.calendar{padding:15px}.side{padding:18px}}
+ .today {
+  outline: 3px solid rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.25) !important;
+  box-shadow: 0 0 18px rgba(255,255,255,0.45);
+  font-weight: 800;
+}
 </style>
 </head>
 <body>
@@ -67,7 +73,14 @@ function render(){
  const first=new Date(view.getFullYear(),view.getMonth(),1), last=new Date(view.getFullYear(),view.getMonth()+1,0);
  let start=first.getDay(), total=Math.ceil((start+last.getDate())/7)*7, box=document.querySelector("#days"); box.innerHTML="";
  for(let i=0;i<total;i++){let n=i-start+1,d=new Date(view.getFullYear(),view.getMonth(),n), div=document.createElement("div");div.className="day";
-  if(n<1||n>last.getDate())div.classList.add("muted");else {div.textContent=n;let now=new Date();if(key(d)===key(now))div.classList.add("today");if(key(d)===key(selected))div.classList.add("selected");if(events[key(d)]?.length){let dot=document.createElement("span");dot.className="dot";div.appendChild(dot)}div.onclick=()=>{selected=d;renderSide();render()}}
+  if(n<1||n>last.getDate())div.classList.add("muted");else {div.textContent=n;const today=new Date();
+if(
+  d.getFullYear()===today.getFullYear() &&
+  d.getMonth()===today.getMonth() &&
+  d.getDate()===today.getDate()
+){
+  div.classList.add("today");
+}let now=new Date();if(key(d)===key(now))div.classList.add("today");if(key(d)===key(selected))div.classList.add("selected");if(events[key(d)]?.length){let dot=document.createElement("span");dot.className="dot";div.appendChild(dot)}div.onclick=()=>{selected=d;renderSide();render()}}
   box.appendChild(div)
  }
  renderSide()
