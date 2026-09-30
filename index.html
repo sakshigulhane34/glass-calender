@@ -43,7 +43,7 @@ header{padding:22px 24px;display:flex;justify-content:space-between;align-items:
 </section>
 <div class="footer">Your events and timezone are saved locally in this browser. No account required.</div>
 </div>
-<button id="installBtn"
+<button id="installBtn" onclick="installCalendar()"
 display:block;
 margin:20px auto;
 padding:14px 24px;
@@ -92,26 +92,21 @@ document.querySelector("#next").onclick=()=>{view.setMonth(view.getMonth()+1);re
 document.querySelector("#todayBtn").onclick=()=>{let d=new Date();view=new Date(d.getFullYear(),d.getMonth(),1);selected=d;render()}
 document.querySelector("#add").onclick=()=>{let text=prompt("Event name:");if(text?.trim()){(events[key(selected)]??=[]).push(text.trim());save();render()}}
 tz.onchange=()=>{localStorage.setItem("gc_tz",tz.value);render()}
-let deferredPrompt=null;
-const installBtn=document.querySelector("#installBtn");
-window.addEventListener("beforeinstallprompt",e=>{
- e.preventDefault(); deferredPrompt=e; installBtn.style.display="inline-block";
-});
-installBtn?.addEventListener("click",async()=>{
+ function installCalendar(){
   if(deferredPrompt){
     deferredPrompt.prompt();
 
-    const result=await deferredPrompt.userChoice;
+    deferredPrompt.userChoice.then(function(result){
+      if(result.outcome==="accepted"){
+        document.querySelector("#installBtn").style.display="none";
+      }
+      deferredPrompt=null;
+    });
 
-    if(result.outcome==="accepted"){
-      installBtn.style.display="none";
-    }
-
-    deferredPrompt=null;
   }else{
-    alert("Chrome ke ⋮ menu par tap karein → Install app / Add to Home screen");
+    alert("Install ke liye Chrome ke ⋮ menu par tap karein → Install app → Install");
   }
-});
+}
 window.addEventListener("appinstalled",()=>{installBtn.style.display="none";});
 if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
 
