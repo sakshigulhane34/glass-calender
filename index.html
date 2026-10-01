@@ -85,7 +85,7 @@ function hijriMonthYear(d){
     year:"numeric"
   }).formatToParts(d);
 
-  const month = parts.find(p => p.type === "month")?.value || 0 "";
+  const month = parts.find(p => p.type === "month")?.value ||"";
   const year = parts.find(p => p.type === "year")?.value || "";
 
   const names = {
