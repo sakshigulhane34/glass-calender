@@ -79,6 +79,22 @@ const tz=document.querySelector("#tz"); zones.forEach(z=>{let o=document.createE
 tz.value=localStorage.getItem("gc_tz")||"Auto / Device";
 let view=new Date(), selected=new Date(); view.setDate(1);
 const key=d=>d.toISOString().slice(0,10);
+ const holidays = {
+  "2026-01-26": "Republic Day",
+  "2026-03-21": "Eid-ul-Fitr",
+  "2026-03-31": "Mahavir Jayanti",
+  "2026-04-03": "Good Friday",
+  "2026-05-01": "Buddha Purnima",
+  "2026-05-27": "Eid-ul-Zuha (Bakrid)",
+  "2026-06-26": "Muharram",
+  "2026-08-15": "Independence Day",
+  "2026-08-26": "Eid-e-Milad",
+  "2026-10-02": "Gandhi Jayanti",
+  "2026-10-20": "Dussehra",
+  "2026-11-08": "Diwali",
+  "2026-11-24": "Guru Nanak Jayanti",
+  "2026-12-25": "Christmas"
+};
  function hijriMonthYear(d){
   const parts = new Intl.DateTimeFormat("en-US-u-ca-islamic-umalqura",{
     month:"numeric",
