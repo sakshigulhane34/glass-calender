@@ -97,8 +97,10 @@ function hijriMonthYear(d){
 
  
  function render(){
- document.querySelector("#month").textContent=new Intl.DateTimeFormat(undefined,{month:"long",year:"numeric"}).format(view);
- const first=new Date(view.getFullYear(),view.getMonth(),1), last=new Date(view.getFullYear(),view.getMonth()+1,0);
+document.querySelector("#month").textContent=
+new Intl.DateTimeFormat(undefined,{month:"long",year:"numeric"}).format(view)
++" • "+
+hijriMonthYear(view); const first=new Date(view.getFullYear(),view.getMonth(),1), last=new Date(view.getFullYear(),view.getMonth()+1,0);
  let start=first.getDay(), total=Math.ceil((start+last.getDate())/7)*7, box=document.querySelector("#days"); box.innerHTML="";
  for(let i=0;i<total;i++){let n=i-start+1,d=new Date(view.getFullYear(),view.getMonth(),n), div=document.createElement("div");div.className="day";
   if(n<1||n>last.getDate())div.classList.add("muted");else {div.innerHTML=n+'<small style="display:block;font-size:9px;margin-top:4px;opacity:.75;white-space:nowrap;">'+hijriDate(d)+'</small>';const today=new Date();
