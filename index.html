@@ -85,21 +85,19 @@ function key(d){
   return `${y}-${m}-${day}`;
 }
  const holidays = {
-  "2026-01-26": "Republic Day",
-  "2026-03-21": "Eid-ul-Fitr",
-  "2026-03-31": "Mahavir Jayanti",
-  "2026-04-03": "Good Friday",
-  "2026-05-01": "Buddha Purnima",
-  "2026-05-27": "Eid-ul-Zuha (Bakrid)",
-  "2026-06-26": "Muharram",
-  "2026-08-15": "Independence Day",
-  "2026-08-26": "Eid-e-Milad",
-  "2026-10-02": "Gandhi Jayanti",
-  "2026-10-20": "Dussehra",
-  "2026-11-08": "Diwali",
-  "2026-11-24": "Guru Nanak Jayanti",
-  "2026-12-25": "Christmas"
+  "01-26": "Republic Day",
+  "08-15": "Independence Day",
+  "10-02": "Gandhi Jayanti",
+  "12-25": "Christmas"
 };
+
+function getHoliday(d){
+  const monthDay =
+    String(d.getMonth()+1).padStart(2,"0") + "-" +
+    String(d.getDate()).padStart(2,"0");
+
+  return holidays[monthDay] || null;
+}
  function hijriMonthYear(d){
   const parts = new Intl.DateTimeFormat("en-US-u-ca-islamic-umalqura",{
     month:"numeric",
@@ -146,12 +144,12 @@ if(
   d.getDate()===today.getDate()
 ){
   div.classList.add("today");
-}let now=new Date();if(key(d)===key(now))div.classList.add("today");if(key(d)===key(selected))div.classList.add("selected");if(holidays[key(d)]){
+}let now=new Date();if(key(d)===key(now))div.classList.add("today");if(key(d)===key(selected))div.classList.add("selected");if(getHoliday(d)){
   div.classList.add("holiday");
 
   const holidayName = document.createElement("small");
   holidayName.className = "holiday-name";
-  holidayName.textContent = holidays[key(d)];
+  holidayName.textContent = getHoliday(d);
 
   div.appendChild(holidayName);
 }if(events[key(d)]?.length){let dot=document.createElement("span");dot.className="dot";div.appendChild(dot)}div.onclick=()=>{selected=d;renderSide();render()}}
