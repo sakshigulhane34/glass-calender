@@ -116,7 +116,9 @@ installBtn.style.display="none";
 const isInstalled =
   window.matchMedia("(display-mode: standalone)").matches ||
   window.navigator.standalone === true;
-
+if(isInstalled){
+  installBtn.style.display="none";
+}
 if(!isInstalled){
 
   window.addEventListener("beforeinstallprompt",e=>{
