@@ -78,7 +78,12 @@ const zones=["Auto / Device","UTC","Asia/Kolkata","Europe/London","America/New_Y
 const tz=document.querySelector("#tz"); zones.forEach(z=>{let o=document.createElement("option");o.value=z;o.textContent=z;tz.appendChild(o)});
 tz.value=localStorage.getItem("gc_tz")||"Auto / Device";
 let view=new Date(), selected=new Date(); view.setDate(1);
-const key=d=>d.toISOString().slice(0,10);
+function key(d){
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,"0");
+  const day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
  const holidays = {
   "2026-01-26": "Republic Day",
   "2026-03-21": "Eid-ul-Fitr",
