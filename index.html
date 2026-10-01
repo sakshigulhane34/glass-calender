@@ -58,8 +58,8 @@ header{padding:22px 24px;display:flex;justify-content:space-between;align-items:
 </section>
 <div class="footer">Your events and timezone are saved locally in this browser. No account required.</div>
 </div>
-<button id="installBtn" hidden onclick="installCalendar()"
-display:block;
+<button id="installBtn" hidden onclick="installCalendar()" style="
+display:inline-block;
 margin:20px auto;
 padding:14px 24px;
 border:none;
@@ -72,7 +72,7 @@ box-shadow:0 8px 25px rgba(0,0,0,.3);
 cursor:pointer;
 ">
 📲 Install Glass Calendar
-</button> 
+</button>
 <script>
 const zones=["Auto / Device","UTC","Asia/Kolkata","Europe/London","America/New_York","America/Los_Angeles","Asia/Dubai","Asia/Riyadh","Asia/Tokyo","Asia/Shanghai","Asia/Singapore","Australia/Sydney","Europe/Berlin","Europe/Paris","Africa/Johannesburg","America/Sao_Paulo"];
 const tz=document.querySelector("#tz"); zones.forEach(z=>{let o=document.createElement("option");o.value=z;o.textContent=z;tz.appendChild(o)});
