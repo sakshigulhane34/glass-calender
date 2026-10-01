@@ -79,6 +79,7 @@ const tz=document.querySelector("#tz"); zones.forEach(z=>{let o=document.createE
 tz.value=localStorage.getItem("gc_tz")||"Auto / Device";
 let view=new Date(), selected=new Date(); view.setDate(1);
 const key=d=>d.toISOString().slice(0,10);
+ let events = JSON.parse(localStorage.getItem("gc_events") || "{}");
 function hijriMonthYear(d){
   const parts = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura",{
     month:"long",
