@@ -108,30 +108,45 @@ document.querySelector("#todayBtn").onclick=()=>{let d=new Date();view=new Date(
 document.querySelector("#add").onclick=()=>{let text=prompt("Event name:");if(text?.trim()){(events[key(selected)]??=[]).push(text.trim());save();render()}}
 tz.onchange=()=>{localStorage.setItem("gc_tz",tz.value);render()}
 let deferredPrompt=null;
+
 const installBtn=document.querySelector("#installBtn");
 
-window.addEventListener("beforeinstallprompt",e=>{
-  e.preventDefault();
-  deferredPrompt=e;
-});
+installBtn.style.display="none";
 
-function installCalendar(){
-  if(deferredPrompt){
-    deferredPrompt.prompt();
+const isInstalled =
+  window.matchMedia("(display-mode: standalone)").matches ||
+  window.navigator.standalone === true;
 
-    deferredPrompt.userChoice.then(function(result){
-      if(result.outcome==="accepted"){
-        installBtn.style.display="none";
-      }
-      deferredPrompt=null;
-    });
-  }else{
-    alert("Install option abhi available nahi hai. Chrome menu ⋮ → Install app / Add to Home screen karein.");
+if(!isInstalled){
+
+  window.addEventListener("beforeinstallprompt",e=>{
+    e.preventDefault();
+    deferredPrompt=e;
+    installBtn.style.display="block";
+  });
+
+}
+
+async function installCalendar(){
+
+  if(!deferredPrompt){
+    return;
   }
+
+  deferredPrompt.prompt();
+
+  const result=await deferredPrompt.userChoice;
+
+  if(result.outcome==="accepted"){
+    installBtn.style.display="none";
+  }
+
+  deferredPrompt=null;
 }
 
 window.addEventListener("appinstalled",()=>{
   installBtn.style.display="none";
+  deferredPrompt=null;
 });
 if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
 
