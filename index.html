@@ -107,49 +107,48 @@ document.querySelector("#next").onclick=()=>{view.setMonth(view.getMonth()+1);re
 document.querySelector("#todayBtn").onclick=()=>{let d=new Date();view=new Date(d.getFullYear(),d.getMonth(),1);selected=d;render()}
 document.querySelector("#add").onclick=()=>{let text=prompt("Event name:");if(text?.trim()){(events[key(selected)]??=[]).push(text.trim());save();render()}}
 tz.onchange=()=>{localStorage.setItem("gc_tz",tz.value);render()}
-let deferredPrompt=null;
+let deferredPrompt = null;
 
-const installBtn=document.querySelector("#installBtn");
+const installBtn = document.querySelector("#installBtn");
 
-installBtn.style.display="none";
+installBtn.hidden = true;
 
-const isInstalled =
-  window.matchMedia("(display-mode: standalone)").matches ||
-  window.navigator.standalone === true;
-if(isInstalled){
-  installBtn.style.display="none";
-}
-if(!isInstalled){
+// Website install ke liye ready ho
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
 
-  window.addEventListener("beforeinstallprompt",e=>{
-    e.preventDefault();
-    deferredPrompt=e;
-    installBtn.style.display="block";
-  });
-
-}
-
-async function installCalendar(){
-
-  if(!deferredPrompt){
-    return;
+  // Sirf website par button dikhao
+  if (!window.matchMedia("(display-mode: standalone)").matches) {
+    installBtn.hidden = false;
   }
+});
+
+// Install button
+async function installCalendar() {
+  if (!deferredPrompt) return;
 
   deferredPrompt.prompt();
 
-  const result=await deferredPrompt.userChoice;
+  await deferredPrompt.userChoice;
 
-  if(result.outcome==="accepted"){
-    installBtn.style.display="none";
-  }
-
-  deferredPrompt=null;
+  installBtn.hidden = true;
+  deferredPrompt = null;
 }
 
-window.addEventListener("appinstalled",()=>{
-  installBtn.style.display="none";
-  deferredPrompt=null;
+// Install hone ke baad button permanently hide
+window.addEventListener("appinstalled", () => {
+  installBtn.hidden = true;
+  deferredPrompt = null;
 });
+
+// Agar app already installed hai
+if (
+  window.matchMedia("(display-mode: standalone)").matches ||
+  window.navigator.standalone === true
+) {
+  installBtn.hidden = true;
+}
 if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
 
 render();
