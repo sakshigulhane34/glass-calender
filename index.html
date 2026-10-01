@@ -81,7 +81,22 @@ let view=new Date(), selected=new Date(); view.setDate(1);
 const key=d=>d.toISOString().slice(0,10);
 let events=JSON.parse(localStorage.getItem("gc_events")||"{}");
 function fmt(d, opts={}){let zone=tz.value==="Auto / Device"?undefined:tz.value;return new Intl.DateTimeFormat(undefined,{timeZone:zone,...opts}).format(d)}
-function render(){
+function hijriDate(d){
+  try{
+    return new Intl.DateTimeFormat("en-u-ca-islamic-umalqura",{
+      day:"numeric",
+      month:"short",
+      year:"numeric"
+    }).format(d);
+  }catch(e){
+    return new Intl.DateTimeFormat("en-u-ca-islamic-civil",{
+      day:"numeric",
+      month:"short",
+      year:"numeric"
+    }).format(d);
+  }
+}
+ function render(){
  document.querySelector("#month").textContent=new Intl.DateTimeFormat(undefined,{month:"long",year:"numeric"}).format(view);
  const first=new Date(view.getFullYear(),view.getMonth(),1), last=new Date(view.getFullYear(),view.getMonth()+1,0);
  let start=first.getDay(), total=Math.ceil((start+last.getDate())/7)*7, box=document.querySelector("#days"); box.innerHTML="";
