@@ -141,7 +141,15 @@ if(
   d.getDate()===today.getDate()
 ){
   div.classList.add("today");
-}let now=new Date();if(key(d)===key(now))div.classList.add("today");if(key(d)===key(selected))div.classList.add("selected");if(events[key(d)]?.length){let dot=document.createElement("span");dot.className="dot";div.appendChild(dot)}div.onclick=()=>{selected=d;renderSide();render()}}
+}let now=new Date();if(key(d)===key(now))div.classList.add("today");if(key(d)===key(selected))div.classList.add("selected");if(holidays[key(d)]){
+  div.classList.add("holiday");
+
+  const holidayName = document.createElement("small");
+  holidayName.className = "holiday-name";
+  holidayName.textContent = holidays[key(d)];
+
+  div.appendChild(holidayName);
+}if(events[key(d)]?.length){let dot=document.createElement("span");dot.className="dot";div.appendChild(dot)}div.onclick=()=>{selected=d;renderSide();render()}}
   box.appendChild(div)
  }
  renderSide()
